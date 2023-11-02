@@ -1,10 +1,7 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Button, ButtonGroup } from '@mui/material';
-import {
-  ChatCompletionRequestMessage,
-  ChatCompletionRequestMessageRoleEnum,
-} from 'openai';
+import { OpenAI } from 'openai';
 import { useMemo, useState } from 'react';
 import StoryPage from './StoryPage';
 
@@ -33,7 +30,7 @@ The first page, which gives some backstory on the protagonist, reads:
 
 export default function Story() {
   const [completedPages, setCompletedPages] = useState<CompletedPage[]>([]);
-  const prefixes = useMemo<ChatCompletionRequestMessage[][]>(
+  const prefixes = useMemo<OpenAI.ChatCompletionMessageParam[][]>(
     () =>
       completedPages
         .reduce(
@@ -43,13 +40,13 @@ export default function Story() {
         .map((completedPages) => [
           { role: 'user', content: initialPrompt },
           ...completedPages.flatMap(
-            ({ content, choice }): ChatCompletionRequestMessage[] => [
+            ({ content, choice }): OpenAI.ChatCompletionMessageParam[] => [
               {
-                role: ChatCompletionRequestMessageRoleEnum.Assistant,
+                role: 'assistant',
                 content,
               },
               {
-                role: ChatCompletionRequestMessageRoleEnum.User,
+                role: 'user',
                 content: choice.toString(),
               },
             ]

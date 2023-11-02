@@ -11,7 +11,7 @@ import {
   RadioGroup,
 } from '@mui/material';
 import Image from 'next/image';
-import { ChatCompletionRequestMessage } from 'openai';
+import { OpenAI } from 'openai';
 import { useMemo, useState } from 'react';
 import { DIVIDER } from '../constants';
 import { useGeneratedImage, useGeneratedText } from '../hooks';
@@ -21,7 +21,7 @@ const IMAGE_SIZE = 512;
 const PADDING = 32;
 
 interface StoryPageProps {
-  prefix: ChatCompletionRequestMessage[];
+  prefix: OpenAI.ChatCompletionMessageParam[];
   onAddPage: (content: string, choice: number) => void;
   onDeleteFuturePages: () => void;
 }

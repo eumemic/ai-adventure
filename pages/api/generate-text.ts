@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI, { ClientOptions } from 'openai';
 
-const configuration = new Configuration({
+const configuration: ClientOptions = {
   apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+};
+const openai = new OpenAI(configuration);
 
 export default async function (
   req: NextApiRequest,
@@ -21,13 +21,14 @@ export default async function (
   }
 
   try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      max_tokens: 10,
       messages: req.body.messages,
     });
     res
       .status(200)
-      .json({ result: completion.data.choices[0].message.content || '' });
+      .json({ result: completion.choices[0].message.content || '' });
   } catch (error) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {

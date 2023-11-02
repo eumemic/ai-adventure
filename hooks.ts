@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ChatCompletionRequestMessage } from 'openai';
+import type { OpenAI } from 'openai';
 
-export function useGeneratedText(messages: ChatCompletionRequestMessage[]) {
+export function useGeneratedText(
+  messages: OpenAI.ChatCompletionMessageParam[]
+) {
   return useGenerated('/api/generate-text', JSON.stringify({ messages }));
 }
 
