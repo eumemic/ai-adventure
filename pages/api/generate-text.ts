@@ -23,7 +23,6 @@ export default async function (
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
-      max_tokens: 10,
       messages: req.body.messages,
     });
     res

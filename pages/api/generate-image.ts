@@ -24,7 +24,7 @@ export default async function (
     const response = await openai.images.generate({
       n: 1,
       size: '512x512',
-      prompt: req.body.prompt,
+      prompt: req.body.prompt.slice(0, 1000),
     });
     res.status(200).json({ result: response.data[0].url || '' });
   } catch (error) {
