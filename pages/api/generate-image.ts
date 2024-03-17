@@ -22,8 +22,9 @@ export default async function (
 
   try {
     const response = await openai.images.generate({
+      model: 'dall-e-3',
       n: 1,
-      size: '512x512',
+      size: '1024x1024',
       prompt: req.body.prompt.slice(0, 1000),
     });
     res.status(200).json({ result: response.data[0].url || '' });
