@@ -43,14 +43,14 @@ function useGenerated(
       const data = await response.json();
       if (response.status !== 200) {
         throw (
-          data.error ||
+          data.error?.message ||
           new Error(`Request failed with status ${response.status}`)
         );
       }
 
       setResult(data.result);
     } catch (e) {
-      setErrorMessage(e.message);
+      setErrorMessage(e instanceof Error ? e.message : String(e));
     }
   }, [url, body]);
 

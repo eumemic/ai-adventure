@@ -29,12 +29,15 @@ export default async function (
     });
     res.status(200).json({ result: response.data[0].url || '' });
   } catch (error) {
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
-      console.error(error.response.status, error.response.data);
-      res.status(error.response.status).json(error.response.data);
+    if (error instanceof OpenAI.APIError) {
+      console.error(error.status, error.error);
+      res.status(error.status).json({
+        error: {
+          message: error.message,
+        },
+      });
     } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
+      console.error(`Error with OpenAI API request: ${error}`);
       res.status(500).json({
         error: {
           message: 'An error occurred during your request.',
