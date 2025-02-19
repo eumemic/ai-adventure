@@ -40,7 +40,7 @@ export default function StoryPage({
     useGeneratedText(prefix);
   const [selectedChoice, setSelectedChoice] = useState<number | undefined>();
 
-  const structure = useMemo<StoryStructure>(() => {
+  const structure = useMemo<StoryStructure | undefined>(() => {
     if (!content) return undefined;
     const dividerIndex = content.indexOf(DIVIDER);
     if (dividerIndex < 0) return { description: content };
@@ -87,7 +87,7 @@ export default function StoryPage({
                 selectedChoice={selectedChoice}
                 onChoose={(choice) => {
                   setSelectedChoice(choice);
-                  onAddPage(content, choice);
+                  if (content) onAddPage(content, choice);
                 }}
               />
             )}
