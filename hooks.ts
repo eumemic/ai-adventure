@@ -21,13 +21,15 @@ export function useGeneratedImage(prompt: string | undefined) {
 function useGenerated(
   url: string,
   body: string | undefined
-): [string | undefined, string | undefined, () => Promise<void>] {
+): [string | undefined, string | undefined, () => Promise<void>, boolean] {
   const [result, setResult] = useState<string | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
+  const [isComplete, setIsComplete] = useState(false);
 
   const regenerate = useCallback(async () => {
     setResult(undefined);
     setErrorMessage(undefined);
+    setIsComplete(false);
 
     if (!body) return;
 
@@ -80,8 +82,10 @@ function useGenerated(
       }
 
       reader.releaseLock();
+      setIsComplete(true);
     } catch (e) {
       setErrorMessage(e instanceof Error ? e.message : String(e));
+      setIsComplete(true);
     }
   }, [url, body]);
 
@@ -89,5 +93,5 @@ function useGenerated(
     regenerate();
   }, [regenerate]);
 
-  return [result, errorMessage, regenerate];
+  return [result, errorMessage, regenerate, isComplete];
 }

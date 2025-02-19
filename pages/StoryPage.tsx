@@ -36,7 +36,7 @@ export default function StoryPage({
   onAddPage,
   onDeleteFuturePages,
 }: StoryPageProps) {
-  const [content, contentErrorMessage, regenerateContent] =
+  const [content, contentErrorMessage, regenerateContent, isTextComplete] =
     useGeneratedText(prefix);
   const [selectedChoice, setSelectedChoice] = useState<number | undefined>();
 
@@ -92,7 +92,7 @@ export default function StoryPage({
               />
             )}
           </div>
-          <StoryImage structure={structure} />
+          {isTextComplete && <StoryImage structure={structure} />}
         </div>
       ) : contentErrorMessage ? (
         <ErrorMessage message={contentErrorMessage} />

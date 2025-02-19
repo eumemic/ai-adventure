@@ -35,8 +35,10 @@ export default async function (
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content || '';
       res.write(`data: ${JSON.stringify({ content })}\n\n`);
-      if (typeof (res as any).flush === 'function') {
-        (res as any).flush();
+      // NextApiResponse doesn't include flush, but it's available in Node's ServerResponse
+      const nodeRes = res as NextApiResponse & { flush?: () => void };
+      if (typeof nodeRes.flush === 'function') {
+        nodeRes.flush();
       }
     }
 
