@@ -8,7 +8,7 @@ const openai = new OpenAI(configuration);
 
 export default async function (
   req: NextApiRequest,
-  res: NextApiResponse<{ result: string } | { error: { message: string } }>
+  res: NextApiResponse
 ) {
   if (!configuration.apiKey) {
     res.status(500).json({
@@ -20,14 +20,28 @@ export default async function (
     return;
   }
 
+  // Set headers for streaming
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
   try {
-    const completion = await openai.chat.completions.create({
+    const stream = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: req.body.messages,
+      stream: true,
     });
-    res
-      .status(200)
-      .json({ result: completion.choices[0].message.content || '' });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || '';
+      res.write(`data: ${JSON.stringify({ content })}\n\n`);
+      if (typeof (res as any).flush === 'function') {
+        (res as any).flush();
+      }
+    }
+
+    res.write('data: [DONE]\n\n');
+    res.end();
   } catch (error) {
     if (error instanceof OpenAI.APIError) {
       console.error(error.status, error.error);
