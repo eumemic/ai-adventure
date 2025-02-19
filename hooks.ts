@@ -40,15 +40,46 @@ function useGenerated(
         body,
       });
 
-      const data = await response.json();
       if (response.status !== 200) {
+        const data = await response.json();
         throw (
           data.error?.message ||
           new Error(`Request failed with status ${response.status}`)
         );
       }
 
-      setResult(data.result);
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No reader available');
+
+      let accumulatedContent = '';
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // Convert the chunk to text
+        const chunk = new TextDecoder().decode(value);
+        const lines = chunk.split('\n');
+
+        // Process each SSE message
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') break;
+
+            try {
+              const { content } = JSON.parse(data);
+              accumulatedContent += content;
+              setResult(accumulatedContent);
+            } catch (e) {
+              console.error('Error parsing SSE message:', e);
+            }
+          }
+        }
+      }
+
+      reader.releaseLock();
     } catch (e) {
       setErrorMessage(e instanceof Error ? e.message : String(e));
     }
